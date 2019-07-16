@@ -172,7 +172,6 @@
           font-weight: bold;
           line-height: 28px;
           color: #003164;
-          text-transform: uppercase;
         }
         .context__down {
           width: 12px;

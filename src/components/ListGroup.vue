@@ -49,7 +49,6 @@
         border-radius: 50%;
       }
       &__word {
-        text-transform: uppercase;
         font-weight: bold;
         line-height: 24px;
         font-size: 16px;
@@ -63,7 +62,6 @@
     }
     .listGroup-more {
       width: 445px;
-      text-transform: uppercase;
       line-height: 19px;
       font-size: 16px;
       color: $lightColor;

@@ -1,10 +1,7 @@
 <template>
   <div class="home">
     <article class="home-left" :class="{'breakTime':isbreakTime}">
-      <section class="home-left__add">
-        <input placeholder="add a new mission…" />
-        <i class="material-icons">add</i>
-      </section>
+      <AddInput></AddInput>
       <Time @breckTime="(val)=>{isbreakTime = val}"></Time>
       <ListGroup :isbreakTime="isbreakTime"></ListGroup>
     </article>
@@ -24,12 +21,13 @@
 <script>
   import ListGroup from '../components/ListGroup'
   import Time from '../components/Time'
-
+  import AddInput from '../components/AddInput'
   export default {
     name: 'home',
     components: {
       ListGroup,
-      Time
+      AddInput,
+      Time,
     },
     data() {
       return {
@@ -61,39 +59,6 @@
       background-color: $lightBg;
       padding: 48px 0px 48px 85px;
       position: relative;
-      &__add {
-        height: 56px;
-        width: 445px;
-        color: $lightColor;
-        position: relative;
-        font-style: italic;
-        font-weight: bold;
-        input {
-          height: 100%;
-          width: 100%;
-          padding: 0px 16px;
-          font-size: 16px;
-          border: none;
-          color: $lightColor;
-          font-style: italic;
-          font-weight: bold;
-          text-transform: uppercase;
-        }
-        i {
-          position: absolute;
-          cursor: pointer;
-          top: 50%;
-          right: 16px;
-          transform: translate(0, -50%);
-        }
-        ::placeholder {
-          font-size: 16px;
-          font-weight: bold;
-          font-style: italic;
-          text-transform: uppercase;
-          color: $lightColor;
-        }
-      }
     }
     &-right {
       width: 35%;
