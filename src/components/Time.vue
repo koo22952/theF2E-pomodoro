@@ -31,7 +31,7 @@
         </template>
         <template v-else>
           <i v-if="!isbreak" class="material-icons" @click.once="handleClick('break')">play_arrow</i>
-          <i v-else class="material-icons">pause</i>
+          <i v-else class="material-icons" @click="handlePause">pause</i>
         </template>
       </div>
     </section>
