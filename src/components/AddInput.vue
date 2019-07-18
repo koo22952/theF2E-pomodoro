@@ -34,6 +34,7 @@
       color: $lightColor;
       font-style: italic;
       font-weight: bold;
+      text-transform: uppercase;
     }
     i {
       position: absolute;

@@ -11,11 +11,11 @@ export default new Router({
       path: '*',
       redirect: '/'
     },
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: Home
-    // },
+    {
+      path: '/home',
+      name: 'home',
+      component: Home
+    },
     {
       path: '/',
       name: 'Detail',
