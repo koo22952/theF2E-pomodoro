@@ -1,8 +1,13 @@
 <template>
   <section class="home-left__listGroup">
-    <div class="listGroup-list" v-for=" item in 3">
+    <div
+      class="listGroup-list"
+      v-for=" (item,index) in lists"
+      :key="item"
+      v-if="index > 0 && index < 4"
+    >
       <span class="listGroup-list__round"></span>
-      <span class="listGroup-list__word">the second thing to do today</span>
+      <span class="listGroup-list__word">{{item}}</span>
       <span class="listGroup-list__btn">
         <i class="material-icons">play_circle_outline</i>
       </span>
@@ -18,7 +23,7 @@
     props: ["isbreakTime"],
     data() {
       return {
-
+        lists: ['one', 'two', 'three', 'four']
       }
     }
   }

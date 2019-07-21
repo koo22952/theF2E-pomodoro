@@ -17,9 +17,13 @@
       </section>
       <section class="detail-left__clock">
         <div class="clock-downCircle">
-          <div class="clock-upCircle"></div>
           <span class="clock-downCircle__time">25:00</span>
           <span class="clock-downCircle__title">the First thing to do today</span>
+          <div class="clock-upCircle">
+            <div class="clock-upCircle__content">
+              <i class="material-icons">play_arrow</i>
+            </div>
+          </div>
         </div>
       </section>
     </article>
@@ -89,6 +93,23 @@
           background-color: #ffedf7;
           border-radius: 50%;
           position: relative;
+          border: 1px solid black;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          &__time {
+            font-size: 64px;
+            line-height: 64px;
+            color: #ff4384;
+            margin-top: 58px;
+            font-weight: bold;
+          }
+          &__title {
+            color: #003164;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 24px;
+          }
           .clock-upCircle {
             height: 116px;
             width: 116px;
@@ -98,16 +119,31 @@
             top: -58px;
             left: 50%;
             transform: translate(-50%, 0);
-            z-index: 1;
-            &::after {
-              content: "";
-              width: 104px;
-              height: 104px;
-              // background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            &__content {
+              width: 86px;
+              height: 86px;
+              background-color: #ff4384;
               border-radius: 50%;
-              display: block;
-              margin: 0 auto;
-              border: 1px solid burlywood;
+              position: relative;
+              text-align: center;
+              i {
+                line-height: 86px;
+                font-size: 58px;
+              }
+              &::after {
+                content: "";
+                width: 104px;
+                height: 104px;
+                border-radius: 50%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                border: 2px solid #ff4384;
+              }
             }
           }
         }

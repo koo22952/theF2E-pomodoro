@@ -12,12 +12,12 @@ export default new Router({
       redirect: '/'
     },
     {
-      path: '/home',
+      path: '/',
       name: 'home',
       component: Home
     },
     {
-      path: '/',
+      path: '/Detail',
       name: 'Detail',
       component: Detail
     }
