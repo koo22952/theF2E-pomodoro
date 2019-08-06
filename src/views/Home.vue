@@ -1,16 +1,16 @@
 <template>
   <div class="home">
     <article class="home-left" :class="{'breakTime':isbreakTime}">
-      <AddInput></AddInput>
-      <Time @breckTime="(val)=>{isbreakTime = val}"></Time>
-      <ListGroup :isbreakTime="isbreakTime"></ListGroup>
+      <AddInput :isbreakTime="isbreakTime" @onAddList="onAddList"></AddInput>
+      <Time @breckTime="(val)=>{isbreakTime = val}" :todoNow="todo"></Time>
+      <ListGroup :isbreakTime="isbreakTime" :todoList="todoList" @changeTodo="changeTodo"></ListGroup>
     </article>
     <aside class="home-right">
       <nav class="home-right__nav">
         <div class="nav-icon">
-          <i class="material-icons">list</i>
+          <!-- <i class="material-icons">list</i>
           <i class="material-icons">assessment</i>
-          <i class="material-icons">library_music</i>
+          <i class="material-icons">library_music</i>-->
         </div>
       </nav>
       <div class="nav-title">POMODORO</div>
@@ -31,9 +31,24 @@
     },
     data() {
       return {
-        isbreakTime: false
+        isbreakTime: false,
+        todoList: [],
+        todo: ''
       }
-    }
+    },
+
+    methods: {
+      onAddList(value) {
+        this.todoList.push({
+          name: value,
+          status: false,
+          time: 15,
+        })
+      },
+      changeTodo(value) {
+        this.todo = value
+      }
+    },
   }
 </script>
 

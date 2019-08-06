@@ -4,7 +4,8 @@
       <div class="time-title">
         <div class="time-title__round"></div>
         <div class="time-title__context">
-          <span class="context__up">the First thing to do today</span>
+          <span v-if="!todo" class="context__up">YOU MUST ADD A NEW MISSION</span>
+          <span v-else class="context__up">{{todo}}</span>
           <span class="context__down"></span>
         </div>
       </div>
@@ -22,11 +23,7 @@
     >
       <div class="clock-btn">
         <template v-if="!isbreakTime">
-          <i
-            v-if="!isWorking"
-            class="material-icons"
-            @click.once="handleClick('Working')"
-          >play_arrow</i>
+          <i v-if="!isWorking" class="material-icons" @click="handleClick('Working')">play_arrow</i>
           <i v-else class="material-icons" @click="handlePause">pause</i>
         </template>
         <template v-else>
@@ -50,9 +47,9 @@
 </template>
 
 <script>
-  import { setTimeout } from 'timers';
 
   export default {
+    props: ['todoNow'],
     data() {
       return {
         WorkingSecs: 15,      //工作時間
@@ -63,9 +60,28 @@
         timeSpacing: null,
         circlePart: 360,
         spacingPart: 0,
+        todoChange: false,
+        // todo: ''
+      }
+    },
+    watch: {
+      todoChange() {
+        let el = document.querySelector('#circle')
+        el.style.strokeDashoffset = '360%'
+        clearInterval(this.timeSpacing);
       }
     },
     computed: {
+      todo() {
+        this.isWorking = false
+        this.isbreak = false
+        this.WorkingSecs = 15
+        this.breakSecs = 3
+        this.spacingPart = 0
+        this.circlePart = 360
+        this.todoChange = !this.todoChange
+        return this.todoNow.name
+      },
       pomodoroTime() {
         let secs = this.WorkingSecs
         let min = Math.floor(secs / 60);
@@ -90,6 +106,23 @@
 
     methods: {
       handleClick(type, s) {
+        if (!this.todo) {
+          alert('請選擇您要開始的代辦事項')
+          return
+        }
+
+        switch (type) {
+          case 'Working':
+            progressBarColor = "#ff4384"
+            this.isWorking = true
+            break
+          case 'break':
+            progressBarColor = "#00A7FF"
+            setTimeout(() => {
+              this.isbreak = true
+            }, 1000)
+            break
+        }
         let secs = [`${type}Secs`]
         let el = document.querySelector('#circle')
         let spacing = 295 / this[secs]
@@ -98,21 +131,6 @@
         this.circlePart !== 360 ? circle = this.circlePart : ''
         this.spacingPart === 0 ? this.spacingPart = spacing : spacing = this.spacingPart
 
-        switch (type) {
-          case 'Working':
-            progressBarColor = "#ff4384"
-            setTimeout(() => {
-              this.isWorking = true
-            }, 1000)
-            break
-          case 'break':
-            progressBarColor = "#00A7FF"
-            setTimeout(() => {
-              this.isbreak = true
-            }, 1000)
-
-            break
-        }
 
         el.style.stroke = progressBarColor
 

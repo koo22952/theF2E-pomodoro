@@ -1,29 +1,36 @@
 <template>
   <section class="home-left__listGroup">
-    <div
-      class="listGroup-list"
-      v-for=" (item,index) in lists"
-      :key="item"
-      v-if="index > 0 && index < 4"
-    >
-      <span class="listGroup-list__round"></span>
-      <span class="listGroup-list__word">{{item}}</span>
+    <div class="addNewProject" v-if="!lists.length">
+      <i class="material-icons">youtube_searched_for</i>
+      No tasks...
+    </div>
+    <div v-else class="listGroup-list" v-for=" (item,index) in lists" :key="item.name">
+      <!-- <span class="listGroup-list__round"></span> -->
+      <i class="material-icons listGroup-list__play" @click="onChangeTodo(item)">play_circle_outline</i>
+      <span class="listGroup-list__word">{{item.name}}</span>
       <span class="listGroup-list__btn">
-        <i class="material-icons">play_circle_outline</i>
+        <i class="material-icons">edit</i>
+        <i class="material-icons">delete</i>
       </span>
     </div>
-    <div class="listGroup-more" :class="{'breakTime':isbreakTime}">
+    <!-- <div class="listGroup-more" :class="{'breakTime':isbreakTime}">
       <span>more</span>
-    </div>
+    </div>-->
   </section>
 </template>
 
 <script>
+  import { constants } from 'crypto';
   export default {
-    props: ["isbreakTime"],
+    props: ["isbreakTime", 'todoList'],
     data() {
       return {
-        lists: ['one', 'two', 'three', 'four']
+        lists: this.todoList
+      }
+    },
+    methods: {
+      onChangeTodo(value) {
+        this.$emit('changeTodo', value)
       }
     }
   }
@@ -36,7 +43,40 @@
   $darkColor: #00a7ff;
   $darkBg: #e5f3ff;
 
+  .addNewProject {
+    font-size: 36px;
+    display: flex;
+    align-items: center;
+    i {
+      font-size: 36px;
+      margin-right: 5px;
+    }
+  }
+
   .home-left__listGroup {
+    overflow: hidden;
+    overflow-y: auto;
+    height: 126px;
+    width: 470px;
+
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.03);
+      background-color: #f5f5f5;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar {
+      width: 10px;
+      background-color: #f5f5f5;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #003164;
+      border: 2px solid #555555;
+      border-radius: 10px;
+    }
+
     .listGroup-list {
       width: 445px;
       display: flex;
@@ -53,6 +93,9 @@
         border: 2px solid #003164;
         border-radius: 50%;
       }
+      &__play {
+        cursor: pointer;
+      }
       &__word {
         font-weight: bold;
         line-height: 24px;
@@ -61,8 +104,13 @@
         margin-left: 4px;
         margin-right: auto;
       }
-      i {
-        color: #003164;
+      &__btn {
+        display: flex;
+        align-items: center;
+        i {
+          color: #003164;
+          cursor: pointer;
+        }
       }
     }
     .listGroup-more {
