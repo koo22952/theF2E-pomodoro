@@ -1,12 +1,12 @@
 <template>
   <section class="home-left__add">
     <input
-      v-model="workList"
+      v-model="inputValue"
+      @keyup.13="onAddList"
+      :class="{'wordColor':isbreakTime}"
       placeholder="add a new mission…"
-      :class="{'wordColor':breakTime}"
-      @keyup.13="addList"
     />
-    <i class="material-icons" @click="addList">add</i>
+    <i class="material-icons" @click="onAddList">add</i>
   </section>
 </template>
 
@@ -15,20 +15,20 @@
     props: ['isbreakTime'],
     data() {
       return {
-        breakTime: this.isbreakTime,
-        workList: '',
+        inputValue: ''
       }
     },
     methods: {
-      addList() {
-        if (this.workList === '') {
+      onAddList() {
+        if (this.inputValue === '') {
           return
         }
 
-        this.$emit('onAddList', this.workList)
-        this.workList = ''
+        this.$emit('onAddList', this.inputValue)
+        this.inputValue = ''
+
       }
-    },
+    }
   }
 </script>
 

@@ -32,7 +32,7 @@
       <TodoList></TodoList>
     </article>
     <aside class="detail-nav">
-      <i class="material-icons detail-nav__close">close</i>
+      <i class="material-icons detail-nav__close" @click="onGoBack">close</i>
       <div class="detail-nav__title">
         <span>pomodoro</span>
       </div>
@@ -48,6 +48,11 @@
     components: {
       AddInput,
       TodoList
+    },
+    methods: {
+      onGoBack() {
+        this.$router.push('/')
+      }
     }
   }
 </script>
