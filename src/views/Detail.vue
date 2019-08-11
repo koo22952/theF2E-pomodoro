@@ -6,14 +6,14 @@
           <i class="material-icons">list</i>
           <span class="menu-title">to-do list</span>
         </div>
-        <div class="menu-list">
+        <!-- <div class="menu-list">
           <i class="material-icons">assessment</i>
           <span class="menu-title">analytics</span>
         </div>
         <div class="menu-list">
           <i class="material-icons">library_music</i>
           <span class="menu-title">ringTones</span>
-        </div>
+        </div>-->
       </section>
       <section class="detail-left__clock">
         <div class="clock-downCircle">
@@ -75,7 +75,7 @@
       justify-content: space-between;
       &__menu {
         .menu-list {
-          color: rgba(255, 255, 255, 20%);
+          color: #ff4384;
           font-size: 36px;
           line-height: 36px;
           margin-bottom: 42px;

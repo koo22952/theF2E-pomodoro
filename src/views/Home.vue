@@ -2,18 +2,56 @@
   <div class="home">
     <article class="home-left" :class="{'homeBreakTime':isbreakTime}">
       <AddInput :isbreakTime="isbreakTime" @onAddList="onAddList"></AddInput>
-      <section class="home-left__time">
+      <section class="home-left__time" v-if="!todoDoing.isCompleted">
         <div class="time-title">
-          <div class="time-title__round"></div>
+          <div class="time-title__round" @click="onCompletTodo(todoDoing,'todoDoing')">
+            <i v-if="todoDoing.isClicked" class="material-icons">done</i>
+          </div>
           <div class="time-title__context">
-            <span class="context__up">the First thing to do today</span>
-            <span class="context__down"></span>
+            <span class="context__up">{{todoDoing.title}}</span>
+            <template>
+              <div class="context__down">
+                <template v-for="i in todoDoing.doTimes">
+                  <span class="finishSpan"></span>
+                </template>
+                <!-- <div class="Ring">
+                  <svg width="12" height="12" class="SVG">
+                    <circle
+                      cx="6"
+                      cy="6"
+                      r="3"
+                      fill="none"
+                      stroke-width="6"
+                      stroke-dasharray="18.5"
+                      stroke-dashoffset="18.5"
+                      class="Rate"
+                    />
+                  </svg>
+                </div>-->
+                <div class="Ring" v-show="!isbreakTime">
+                  <svg id="circleSvg2">
+                    <circle
+                      id="circle2"
+                      cx="6"
+                      cy="6"
+                      r="3"
+                      stroke-width="6"
+                      stroke="#ff4384"
+                      stroke-dashoffset="360%"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
         <div class="time-content" :class="{'breakTime':isbreakTime}">
           <span>{{isbreakTime ? breakTime : pomodoroTime }}</span>
         </div>
       </section>
+      <template v-else>
+        <span class="home-left__noAnyDoing">PLEASE ADD TODO TO START...</span>
+      </template>
       <!-- 點開始 -->
       <!-- beginTime -->
       <!-- 點休息開始 -->
@@ -57,11 +95,11 @@
             </span>
             <span class="listGroup-list__word">{{item.title}}</span>
             <span class="listGroup-list__btn">
-              <i class="material-icons">play_circle_outline</i>
+              <i class="material-icons" @click="onChangeTodo(item)">play_circle_outline</i>
             </span>
           </template>
         </div>
-        <div class="listGroup-more" :class="{'breakTime':isbreakTime}">
+        <div class="listGroup-more" :class="{'breakTime':isbreakTime}" v-if="completedTodos.length">
           <span>
             <router-link to="/Detail">more</router-link>
           </span>
@@ -100,40 +138,41 @@
         isbreakTime: false,   //休息時間的時候
         timeSpacing: null,
         circlePart: 360,
+        circlePart2: 360,
         spacingPart: 0,
+        spacingPart2: 0,
         todos: [
           {
-            id: '1321412421414',
+            id: '1565457946245',
             title: 'one',
-            isCompleted: true,
-            isClicked: true,
-          },
-          {
-            id: '132141242124',
-            title: 'osssssss',
             isCompleted: false,
             isClicked: false,
+            doTimes: 0,
           },
-          {
-            id: '132141244124',
-            title: 'oneddgsg',
-            isCompleted: false,
-            isClicked: false,
-          },
-          {
-            id: '132144214124',
-            title: 'ofgdgfdfe',
-            isCompleted: false,
-            isClicked: false,
-          }
         ],
+        todoDoing: {
+          id: '1565457947589',
+          title: 'ofgddfe',
+          isCompleted: false,
+          isClicked: false,
+          doTimes: 2,
+        },
       }
     },
     computed: {
       completedTodos() {
         let notCompletedTodos = this.todos.filter(item => {
           return !item.isCompleted
+        }).sort((x, y) => {
+          return x.id - y.id
         })
+
+        if (this.todoDoing.isCompleted) {
+          notCompletedTodos.length == 0 ? this.todoDoing = this.todos[0] : this.todoDoing = notCompletedTodos[0]
+          notCompletedTodos.splice(0, 1)
+        }
+
+
 
         return notCompletedTodos
       },
@@ -161,14 +200,38 @@
     },
 
     methods: {
+      init() {
+        let el = document.querySelector('#circle')
+        let el2 = document.querySelector('#circle2')
+
+        this.isWorking = false
+        this.isbreak = false
+        this.WorkingSecs = 15
+        this.breakSecs = 3
+        this.spacingPart = 0
+        this.spacingPart2 = 0
+        this.circlePart = 360
+        this.circlePart2 = 360
+        el.style.strokeDashoffset = '360%'
+        el2.style.strokeDashoffset = '360%'
+
+        clearInterval(this.timeSpacing);
+      },
       onPlay(type) {
         let secs = [`${type}Secs`]
         let el = document.querySelector('#circle')
+        let el2 = document.querySelector('#circle2')
         let spacing = 295 / this[secs]
+        let spacing2 = 153 / this[secs]
         let circle = 360
+        let circle2 = 360
         let progressBarColor
         this.circlePart !== 360 ? circle = this.circlePart : ''
+        this.circlePart2 !== 360 ? circle2 = this.circlePart2 : ''
         this.spacingPart === 0 ? this.spacingPart = spacing : spacing = this.spacingPart
+        this.spacingPart2 === 0 ? this.spacingPart2 = spacing2 : spacing2 = this.spacingPart2
+
+
 
         switch (type) {
           case 'Working':
@@ -190,21 +253,19 @@
 
         this.timeSpacing = setInterval(() => {
           if (this[secs] === 0) {
+            type === "Working" ? this.todoDoing.doTimes = this.todoDoing.doTimes + 1 : ''
             this.isbreakTime = !this.isbreakTime
-            this.isWorking = false
-            this.isbreak = false
-            this.WorkingSecs = 15
-            this.breakSecs = 3
-            this.spacingPart = 0
-            this.circlePart = 360
-            this.$emit('breckTime', this.isbreakTime)
-            el.style.strokeDashoffset = '360%'
-            clearInterval(this.timeSpacing);
+            this.init()
+
             return
           }
           circle = circle - spacing
+          circle2 = circle2 - spacing2
           this.circlePart = circle
+          this.circlePart2 = circle2
           el.style.strokeDashoffset = `calc(${circle}%)`
+          el2.style.strokeDashoffset = `calc(${circle2}%)`
+
           this[secs]--
         }, 1000)
 
@@ -216,29 +277,78 @@
       },
       onAddList(value) {
         let timestamp = new Date().getTime();
+
+        if (this.todoDoing.isCompleted) {
+          this.todoDoing = {
+            id: timestamp,
+            title: value,
+            isCompleted: false,
+            isClicked: false,
+            doTimes: 0,
+          }
+          return
+        }
+
         this.todos.push(
           {
             id: timestamp,
             title: value,
             isCompleted: false,
+            isClicked: false,
+            doTimes: 0,
           }
         )
       },
-      onCompletTodo(item) {
-        let newTodos = this.todos.map(todo => {
-          if (todo.id === item.id) {
-            todo.isClicked = !todo.isClicked
+      onCompletTodo(item, type) {
 
+        this.init()
+
+        switch (type) {
+          case 'todoDoing':
+            this.todoDoing.isClicked = true
             setTimeout(() => {
-              todo.isCompleted = !todo.isCompleted
-              return {
-                ...todo,
+              this.isbreakTime = false
+              this.todoDoing.isCompleted = true
+              this.todos.push(this.todoDoing)
+              if (!this.todos[0].isCompleted) {
+
+                this.todoDoing = this.todos[0]
+                this.todos.splice(0, 1)
               }
-            }, 200);
-          } else {
-            return todo
-          }
-        })
+            }, 500);
+
+            break
+          default:
+            let newTodos = this.todos.map(todo => {
+              if (todo.id === item.id) {
+                todo.isClicked = !todo.isClicked
+
+                setTimeout(() => {
+                  todo.isCompleted = !todo.isCompleted
+                  return {
+                    ...todo,
+                  }
+                }, 500);
+              } else {
+                return todo
+              }
+            })
+        }
+
+      },
+      onChangeTodo(item) {
+        this.init()
+
+
+        this.todos.push(this.todoDoing)
+        this.todoDoing = item
+
+        let num = this.todos.map(n => {
+          return n.id
+        }).indexOf(item.id)
+
+        this.todos.splice(num, 1)
+
       }
     }
   }
@@ -250,9 +360,7 @@
   $lightBg: #ffedf7;
   $darkColor: #00a7ff;
   $darkBg: #e5f3ff;
-  a {
-    color: #ffff;
-  }
+
   .home {
     max-width: 1280px;
     height: 100%;
@@ -272,11 +380,18 @@
         .time-title {
           display: flex;
           &__round {
+            cursor: pointer;
             width: 48px;
             height: 48px;
             border: 2px solid #003164;
             border-radius: 50%;
             margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            i {
+              font-size: 32px;
+            }
           }
           &__context {
             display: flex;
@@ -288,11 +403,20 @@
               color: #003164;
             }
             .context__down {
-              width: 12px;
-              height: 12px;
-              border: 1px solid $lightColor;
+              display: inline-flex;
+              margin-left: 1.2px;
               margin-top: 8px;
-              border-radius: 50%;
+              svg {
+                display: block;
+                transform: rotate(-90deg);
+              }
+              .finishSpan {
+                background-color: #003164;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                margin-right: 5px;
+              }
             }
           }
         }
@@ -343,6 +467,11 @@
           i {
             color: #003164;
           }
+          &__btn {
+            i {
+              cursor: pointer;
+            }
+          }
         }
         .listGroup-more {
           width: 445px;
@@ -368,6 +497,11 @@
             }
           }
         }
+      }
+      .home-left__noAnyDoing {
+        font-size: 24px;
+        color: #003164;
+        font-weight: 600;
       }
     }
     &-right {
@@ -491,6 +625,46 @@
     stroke-dasharray: 360%;
     stroke-dashoffset: 360%;
     fill: none;
+  }
+
+  // 小圓
+  .Ring {
+    position: relative;
+    display: inline-block;
+    left: auto;
+    top: auto;
+    width: 12px;
+    height: 12px;
+    vertical-align: bottom;
+    &::before {
+      content: "";
+      position: absolute;
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 1px solid #ff4384;
+      box-sizing: border-box;
+      border-radius: 12px;
+    }
+    #circleSvg2 {
+      position: absolute;
+      top: 50%;
+      transform: translate(0%, -50%) rotate(-90deg);
+      width: 12px;
+      height: 12px;
+      stroke-dasharray: 360%;
+      stroke-dashoffset: 360%;
+      fill: none;
+    }
+
+    .SVG {
+      margin-left: 0px;
+      margin-top: 0px;
+      position: relative;
+      > .Rate {
+        stroke: #ff4384;
+      }
+    }
   }
 
   // 休息的顏色
