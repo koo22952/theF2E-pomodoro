@@ -1,129 +1,214 @@
 <template>
-  <div class="home">
-    <article class="home-left" :class="{'homeBreakTime':isbreakTime}">
-      <AddInput :isbreakTime="isbreakTime" @onAddList="onAddList"></AddInput>
-      <section class="home-left__time" v-if="!todoDoing.isCompleted">
-        <div class="time-title">
-          <div class="time-title__round" @click="onCompletTodo(todoDoing,'todoDoing')">
-            <i v-if="todoDoing.isClicked" class="material-icons">done</i>
-          </div>
-          <div class="time-title__context">
-            <span class="context__up">{{todoDoing.title}}</span>
-            <template>
-              <div class="context__down">
-                <template v-for="i in todoDoing.doTimes">
-                  <span class="finishSpan"></span>
-                </template>
-                <!-- <div class="Ring">
-                  <svg width="12" height="12" class="SVG">
-                    <circle
-                      cx="6"
-                      cy="6"
-                      r="3"
-                      fill="none"
-                      stroke-width="6"
-                      stroke-dasharray="18.5"
-                      stroke-dashoffset="18.5"
-                      class="Rate"
-                    />
-                  </svg>
-                </div>-->
-                <div class="Ring" v-show="!isbreakTime">
-                  <svg id="circleSvg2">
-                    <circle
-                      id="circle2"
-                      cx="6"
-                      cy="6"
-                      r="3"
-                      stroke-width="6"
-                      stroke="#ff4384"
-                      stroke-dashoffset="360%"
-                    />
-                  </svg>
+  <div>
+    <div v-show="!openDetail" class="home">
+      <article class="home-left" :class="{'homeBreakTime':isbreakTime}">
+        <AddInput :isbreakTime="isbreakTime" @onAddList="onAddList"></AddInput>
+        <section v-if="tododoinging !== undefined" class="home-left__time">
+          <div class="time-title">
+            <div class="time-title__round" @click="onCompletTodo(todoDoing,'todoDoing')">
+              <i v-if="todoDoing.isClicked" class="material-icons">done</i>
+            </div>
+            <div class="time-title__context">
+              <span class="context__up">{{todoDoing.title}}</span>
+              <template>
+                <div class="context__down">
+                  <template v-for="i in todoDoing.doTimes">
+                    <span class="finishSpan"></span>
+                  </template>
+                  <div class="Ring" v-show="!isbreakTime">
+                    <svg id="circleSvg2">
+                      <circle
+                        id="circle2"
+                        cx="6"
+                        cy="6"
+                        r="3"
+                        stroke-width="6"
+                        stroke="#ff4384"
+                        stroke-dashoffset="360%"
+                      />
+                    </svg>
+                  </div>
                 </div>
-              </div>
+              </template>
+            </div>
+          </div>
+          <div class="time-content" :class="{'breakTime':isbreakTime}">
+            <span>{{isbreakTime ? breakTime : pomodoroTime }}</span>
+          </div>
+        </section>
+
+        <template v-else>
+          <span class="home-left__noAnyDoing">PLEASE ADD TODO TO START...</span>
+        </template>
+        <!-- 點開始 -->
+        <!-- beginTime -->
+        <!-- 點休息開始 -->
+        <!-- breakBeginTime -->
+        <section
+          class="clock"
+          :class="{'beginTime':isWorking,'breakClock':isbreakTime,'breakBeginTime':isbreak}"
+        >
+          <div class="clock-btn">
+            <template v-if="!isbreakTime">
+              <i v-if="!isWorking" class="material-icons" @click.once="onPlay('Working')">play_arrow</i>
+              <i v-else class="material-icons" @click="onPause">pause</i>
+            </template>
+            <template v-else>
+              <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
+              <i v-else class="material-icons" @click="onPause">pause</i>
             </template>
           </div>
-        </div>
-        <div class="time-content" :class="{'breakTime':isbreakTime}">
-          <span>{{isbreakTime ? breakTime : pomodoroTime }}</span>
-        </div>
-      </section>
-      <template v-else>
-        <span class="home-left__noAnyDoing">PLEASE ADD TODO TO START...</span>
-      </template>
-      <!-- 點開始 -->
-      <!-- beginTime -->
-      <!-- 點休息開始 -->
-      <!-- breakBeginTime -->
-      <section
-        class="clock"
-        :class="{'beginTime':isWorking,'breakClock':isbreakTime,'breakBeginTime':isbreak}"
-      >
+        </section>
+        <svg id="circleSvg">
+          <circle
+            id="circle"
+            cx="50%"
+            cy="50%"
+            r="220"
+            stroke-width="25"
+            stroke="#ff4384"
+            stroke-dashoffset="360%"
+          />
+        </svg>
+        <section class="home-left__listGroup">
+          <div
+            class="listGroup-list"
+            v-for=" (item,index) in isCompletedTodos"
+            :key="item.id"
+            v-if="index >= 0  && index < 3"
+          >
+            <template v-if="!item.isCompleted">
+              <span class="listGroup-list__round" @click="onCompletTodo(item)">
+                <i v-if="item.isClicked" class="material-icons">done</i>
+              </span>
+              <span class="listGroup-list__word">{{item.title}}</span>
+              <span class="listGroup-list__btn">
+                <i class="material-icons" @click="onChangeTodo(item)">play_circle_outline</i>
+              </span>
+            </template>
+          </div>
+          <div
+            class="listGroup-more"
+            :class="{'breakTime':isbreakTime}"
+            v-if="isCompletedTodos.length"
+          >
+            <span @click="onOpenDetail">more</span>
+          </div>
+        </section>
+      </article>
+      <aside class="home-right">
+        <nav class="home-right__nav">
+          <div class="nav-icon">
+            <i class="material-icons" @click="onOpenDetail">list</i>
+            <!-- <i class="material-icons">assessment</i> -->
+            <!-- <i class="material-icons">library_music</i> -->
+          </div>
+        </nav>
+        <div class="nav-title">POMODORO</div>
+      </aside>
+    </div>
+    <div v-show="openDetail" class="detail">
+      <article class="detail-left">
+        <section class="detail-left__menu">
+          <div class="menu-list">
+            <i class="material-icons">list</i>
+            <span class="menu-title">to-do list</span>
+          </div>
+        </section>
+        <!-- 
         <div class="clock-btn">
           <template v-if="!isbreakTime">
-            <i v-if="!isWorking" class="material-icons" @click.once="onPlay('Working')">play_arrow</i>
+            <i v-if="!isWorking" class="material-icons">play_arrow</i>
             <i v-else class="material-icons" @click="onPause">pause</i>
           </template>
           <template v-else>
             <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
             <i v-else class="material-icons" @click="onPause">pause</i>
           </template>
-        </div>
-      </section>
-      <svg id="circleSvg">
-        <circle
-          id="circle"
-          cx="50%"
-          cy="50%"
-          r="220"
-          stroke-width="25"
-          stroke="#ff4384"
-          stroke-dashoffset="360%"
-        />
-      </svg>
-      <section class="home-left__listGroup">
-        <div
-          class="listGroup-list"
-          v-for=" (item,index) in completedTodos"
-          :key="item.id"
-          v-if="index >= 0  && index < 3"
-        >
-          <template v-if="!item.isCompleted">
-            <span class="listGroup-list__round" @click="onCompletTodo(item)">
-              <i v-if="item.isClicked" class="material-icons">done</i>
+        </div>-->
+        <section v-if="tododoinging !== undefined" class="detail-left__clock">
+          <div class="clock-downCircle">
+            <span class="clock-downCircle__time">
+              <span>{{isbreakTime ? breakTime : pomodoroTime }}</span>
             </span>
-            <span class="listGroup-list__word">{{item.title}}</span>
-            <span class="listGroup-list__btn">
-              <i class="material-icons" @click="onChangeTodo(item)">play_circle_outline</i>
-            </span>
-          </template>
+            <span class="clock-downCircle__title">{{todoDoing.title}}</span>
+            <div class="clock-upCircle">
+              <div class="clock-upCircle__content">
+                <template v-if="!isbreakTime">
+                  <i v-if="!isWorking" class="material-icons">play_arrow</i>
+                  <i v-else class="material-icons" @click="onPause">pause</i>
+                </template>
+                <template v-else>
+                  <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
+                  <i v-else class="material-icons" @click="onPause">pause</i>
+                </template>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+      <article class="detail-right">
+        <AddInput :isbreakTime="isbreakTime" @onAddList="onAddList"></AddInput>
+
+        <section class="detail-TodoLists">
+          <div class="todo">
+            <div class="todo__title" @click="todoOpen = !todoOpen">
+              to-do
+              <i class="material-icons" v-if="todoOpen">arrow_drop_up</i>
+              <i class="material-icons" v-else>arrow_drop_down</i>
+            </div>
+            <div class="todoAll" v-if="todoOpen">
+              <div class="todo__listGroup" v-for="item in unDoneTodos" :key="item.id">
+                <div class="listGroup-list">
+                  <span class="listGroup-list__round" @click="onCompletTodo(item)">
+                    <i v-if="item.isClicked" class="material-icons">done</i>
+                  </span>
+                  <span class="listGroup-list__word">{{item.title}}</span>
+                  <span class="listGroup-list__btn">
+                    <i class="material-icons" @click="onChangeTodo(item)">play_circle_outline</i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="todo">
+            <div class="todo__title" @click="todoOpen = !todoOpen">
+              done
+              <i class="material-icons" v-if="!todoOpen">arrow_drop_up</i>
+              <i class="material-icons" v-else>arrow_drop_down</i>
+            </div>
+            <div class="todoAll" v-if="!todoOpen">
+              <div class="todo__listGroup" v-for="item in doneTodos" :key="item.id">
+                <div class="listGroup-list">
+                  <span class="listGroup-list__round" @click="onCompletTodo(item)">
+                    <i v-if="item.isClicked" class="material-icons">done</i>
+                  </span>
+                  <span class="listGroup-list__word delLine">{{item.title}}</span>
+                  <template v-for="i in item.doTimes">
+                    <span class="finishSpan"></span>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+      <aside class="detail-nav">
+        <i class="material-icons detail-nav__close" @click="onOpenDetail('close')">close</i>
+        <div class="detail-nav__title">
+          <span>pomodoro</span>
         </div>
-        <div class="listGroup-more" :class="{'breakTime':isbreakTime}" v-if="completedTodos.length">
-          <span>
-            <router-link to="/Detail">more</router-link>
-          </span>
-        </div>
-      </section>
-    </article>
-    <aside class="home-right">
-      <nav class="home-right__nav">
-        <div class="nav-icon">
-          <router-link to="/Detail">
-            <i class="material-icons">list</i>
-          </router-link>
-          <i class="material-icons">assessment</i>
-          <i class="material-icons">library_music</i>
-        </div>
-      </nav>
-      <div class="nav-title">POMODORO</div>
-    </aside>
+      </aside>
+    </div>
   </div>
 </template>
 
+
+
+
 <script>
   import AddInput from '../components/AddInput'
-  import { createHash } from 'crypto';
+  import { createHash, constants } from 'crypto';
   export default {
     name: 'home',
     components: {
@@ -131,6 +216,8 @@
     },
     data() {
       return {
+        todoOpen: true,
+        openDetail: true,
         WorkingSecs: 5,      //工作時間
         breakSecs: 3,       //休息時間
         isWorking: false,    //點擊工作開始
@@ -141,37 +228,72 @@
         circlePart2: 360,
         spacingPart: 0,
         spacingPart2: 0,
-        todos: [
+        todoDoing: '',
+        totalTodos: [
           {
             id: '1565457946245',
-            title: 'one',
+            title: 'two',
             isCompleted: false,
             isClicked: false,
             doTimes: 0,
+            doing: false,
+          },
+          {
+            id: '1565457946246',
+            title: 'one',
+            isCompleted: true,
+            isClicked: true,
+            doTimes: 3,
+            doing: false,
+          },
+          {
+            id: '1565458946246',
+            title: 'ondde',
+            isCompleted: false,
+            isClicked: false,
+            doTimes: 0,
+            doing: false,
+          },
+          {
+            id: '1565457947589',
+            title: 'ofgddfe',
+            isCompleted: false,
+            isClicked: false,
+            doTimes: 2,
+            doing: true,
           },
         ],
-        todoDoing: {
-          id: '1565457947589',
-          title: 'ofgddfe',
-          isCompleted: false,
-          isClicked: false,
-          doTimes: 2,
-        },
       }
     },
     computed: {
-      completedTodos() {
-        let notCompletedTodos = this.todos.filter(item => {
+      tododoinging() {
+        return this.todoDoing = this.totalTodos.filter(todo => {
+          return todo.doing
+        })[0]
+      },
+      doneTodos() {
+        let newArr = this.totalTodos.filter(item => {
+          return item.isCompleted
+        }).sort((x, y) => {
+          return x.id - y.id
+        })
+        return newArr
+      },
+      unDoneTodos() {
+        let newArr = this.totalTodos.filter(item => {
           return !item.isCompleted
         }).sort((x, y) => {
           return x.id - y.id
         })
+        return newArr
+      },
+      isCompletedTodos() {
 
-        if (this.todoDoing.isCompleted) {
-          notCompletedTodos.length == 0 ? this.todoDoing = this.todos[0] : this.todoDoing = notCompletedTodos[0]
-          notCompletedTodos.splice(0, 1)
-        }
-
+        let notCompletedTodos = this.totalTodos.filter(item => {
+          return !item.isCompleted
+        }).filter(item => {
+          return !item.doing
+        })
 
 
         return notCompletedTodos
@@ -198,7 +320,6 @@
         return min + ':' + sec;
       }
     },
-
     methods: {
       init() {
         let el = document.querySelector('#circle')
@@ -214,7 +335,6 @@
         this.circlePart2 = 360
         el.style.strokeDashoffset = '360%'
         el2.style.strokeDashoffset = '360%'
-
         clearInterval(this.timeSpacing);
       },
       onPlay(type) {
@@ -255,6 +375,7 @@
           if (this[secs] === 0) {
             type === "Working" ? this.todoDoing.doTimes = this.todoDoing.doTimes + 1 : ''
             this.isbreakTime = !this.isbreakTime
+
             this.init()
 
             return
@@ -277,82 +398,113 @@
       },
       onAddList(value) {
         let timestamp = new Date().getTime();
-
-        if (this.todoDoing.isCompleted) {
-          this.todoDoing = {
-            id: timestamp,
-            title: value,
-            isCompleted: false,
-            isClicked: false,
-            doTimes: 0,
-          }
-          return
+        let s = this.totalTodos.filter(item => {
+          return item.doing
+        })
+        if (!s.length) {
+          this.totalTodos.push(
+            {
+              id: timestamp,
+              title: value,
+              isCompleted: false,
+              isClicked: false,
+              doTimes: 0,
+              doing: true,
+            }
+          )
+        } else {
+          this.totalTodos.push(
+            {
+              id: timestamp,
+              title: value,
+              isCompleted: false,
+              isClicked: false,
+              doTimes: 0,
+              doing: false,
+            }
+          )
         }
-
-        this.todos.push(
-          {
-            id: timestamp,
-            title: value,
-            isCompleted: false,
-            isClicked: false,
-            doTimes: 0,
-          }
-        )
       },
       onCompletTodo(item, type) {
+        if (this.todoDoing === undefined) {
 
-        this.init()
+          let num = this.totalTodos.map(todo => {
+            return todo.id
+          }).indexOf(item.id)
 
-        switch (type) {
-          case 'todoDoing':
-            this.todoDoing.isClicked = true
-            setTimeout(() => {
-              this.isbreakTime = false
-              this.todoDoing.isCompleted = true
-              this.todos.push(this.todoDoing)
-              if (!this.todos[0].isCompleted) {
-
-                this.todoDoing = this.todos[0]
-                this.todos.splice(0, 1)
-              }
-            }, 500);
-
-            break
-          default:
-            let newTodos = this.todos.map(todo => {
-              if (todo.id === item.id) {
-                todo.isClicked = !todo.isClicked
-
-                setTimeout(() => {
-                  todo.isCompleted = !todo.isCompleted
-                  return {
-                    ...todo,
-                  }
-                }, 500);
-              } else {
-                return todo
-              }
-            })
+          this.totalTodos[num].doing = true
         }
 
+        this.init()
+        this.isbreakTime = false
+
+
+        this.totalTodos.map(todo => {
+          if (todo.id === item.id) {
+            todo.isClicked = !todo.isClicked
+            todo.isCompleted = !todo.isCompleted
+            return {
+              ...todo,
+            }
+          }
+          return todo
+        })
+
+
+        if (item.id === this.todoDoing.id) {
+
+          let filter
+          filter = this.totalTodos.filter((todo, index) => {
+            if (item.id === this.todoDoing.id) {
+              todo.doing = false
+            }
+
+            return !todo.isClicked
+          })
+
+          if (filter.length) {
+            let num = this.totalTodos.map(todo => {
+              return todo.id
+            }).indexOf(filter[0].id)
+            this.totalTodos[num].doing = true
+            return
+          } else {
+            return
+          }
+        }
       },
       onChangeTodo(item) {
         this.init()
+        this.isbreakTime = false
 
+        let s = this.totalTodos.map(todo => {
+          if (this.todoDoing.id == todo.id) {
+            todo.doing = false
+            return {
+              ...todo
+            }
+          }
+          if (item.id === todo.id) {
+            todo.doing = true
+            return {
+              ...todo
+            }
+          }
+          return todo
+        }).filter(todo => {
+          return todo.doing
+        })
 
-        this.todos.push(this.todoDoing)
-        this.todoDoing = item
-
-        let num = this.todos.map(n => {
-          return n.id
-        }).indexOf(item.id)
-
-        this.todos.splice(num, 1)
-
+        this.todoDoing = s[0]
+      },
+      onOpenDetail(type) {
+        this.openDetail = !this.openDetail
       }
     }
   }
 </script>
+
+
 
 
 <style lang="scss" scoped>
@@ -363,7 +515,7 @@
 
   .home {
     max-width: 1280px;
-    height: 100%;
+    height: 100vh;
     display: flex;
     margin: 0 auto;
 
@@ -682,5 +834,216 @@
       color: $darkColor;
     }
   }
-</style>
 
+  .detail {
+    max-width: 1280px;
+    height: 100vh;
+    display: flex;
+    margin: 0 auto;
+    background-color: #003164;
+    padding: 45px 85px;
+    color: #fff;
+    font-weight: bold;
+    z-index: 999999;
+    &-left {
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      &__menu {
+        .menu-list {
+          color: #ff4384;
+          font-size: 36px;
+          line-height: 36px;
+          margin-bottom: 42px;
+          display: flex;
+          align-items: center;
+          i {
+            font-size: 36px;
+          }
+          .menu-title {
+            margin-left: 8px;
+          }
+        }
+      }
+      &__clock {
+        position: absolute;
+        bottom: -175px;
+        width: 350px;
+        .clock-downCircle {
+          height: 350px;
+          background-color: #ffedf7;
+          border-radius: 50%;
+          position: relative;
+          border: 1px solid black;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          &__time {
+            font-size: 64px;
+            line-height: 64px;
+            color: #ff4384;
+            margin-top: 58px;
+            font-weight: bold;
+          }
+          &__title {
+            color: #003164;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 24px;
+          }
+          .clock-upCircle {
+            height: 116px;
+            width: 116px;
+            background-color: #003164;
+            border-radius: 50%;
+            position: absolute;
+            top: -58px;
+            left: 50%;
+            transform: translate(-50%, 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            &__content {
+              width: 86px;
+              height: 86px;
+              background-color: #ff4384;
+              border-radius: 50%;
+              position: relative;
+              text-align: center;
+              cursor: pointer;
+              i {
+                line-height: 86px;
+                font-size: 58px;
+                z-index: 5;
+              }
+              &::before {
+                content: "";
+                width: 104px;
+                height: 104px;
+                border-radius: 50%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                border: 2px solid #ff4384;
+                z-index: -1;
+              }
+            }
+          }
+        }
+      }
+    }
+    &-right {
+      width: calc(60% - 48px);
+      .detail-TodoLists {
+        width: 445px;
+        .todo {
+          display: flex;
+          margin-top: 48px;
+          flex-direction: column;
+          &__title {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 24px;
+            background-color: rgba(255, 255, 255, 20%);
+            cursor: pointer;
+          }
+          .todoAll {
+            overflow-y: auto;
+            max-height: calc((100vh - 90px) / 2);
+          }
+          .todoAll::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            background-color: #f5f5f5;
+          }
+
+          .todoAll::-webkit-scrollbar {
+            width: 10px;
+            background-color: #f5f5f5;
+          }
+
+          .todoAll::-webkit-scrollbar-thumb {
+            background-color: #000000;
+            border: 2px solid #555555;
+          }
+          &__listGroup {
+            .listGroup-list {
+              display: flex;
+              align-items: center;
+              height: 32px;
+              margin-top: 9px;
+              border-bottom: 1px solid rgba(255, 255, 255, 20%);
+              padding-bottom: 8px;
+              &:first-child {
+                margin-top: 16px;
+              }
+              &__round {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                border: 2px solid #ffff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-right: 6px;
+                i {
+                  font-size: 18px;
+                }
+              }
+              &__word {
+                font-size: 16px;
+                margin-right: auto;
+              }
+              .delLine {
+                font-style: italic;
+                position: relative;
+                &::after {
+                  content: "";
+                  border: 1px solid rgba(255, 255, 255, 80%);
+                  width: 103%;
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                }
+              }
+
+              &__btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+              .finishSpan {
+                background-color: #ffffff;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                margin-left: 8px;
+              }
+            }
+          }
+        }
+      }
+    }
+    &-nav {
+      width: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      &__close {
+        font-size: 48px;
+        cursor: pointer;
+      }
+      &__title {
+        font-size: 24px;
+        line-height: 32px;
+        writing-mode: vertical-lr;
+        display: flex;
+        align-items: flex-end;
+      }
+    }
+  }
+</style>
