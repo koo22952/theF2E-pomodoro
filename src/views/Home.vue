@@ -51,15 +51,11 @@
           <div class="clock-btn">
             <template v-if="unDoneTodos.length">
               <template v-if="!isbreakTime">
-                <i
-                  v-if="!isWorking"
-                  class="material-icons"
-                  @click.once="onPlay('Working')"
-                >play_arrow</i>
+                <i v-if="!isWorking" class="material-icons" @click="onPlay('Working')">play_arrow</i>
                 <i v-else class="material-icons" @click="onPause">pause</i>
               </template>
               <template v-else>
-                <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
+                <i v-if="!isbreak" class="material-icons" @click="onPlay('break')">play_arrow</i>
                 <i v-else class="material-icons" @click="onPause">pause</i>
               </template>
             </template>
@@ -349,6 +345,8 @@
         clearInterval(this.timeSpacing);
       },
       onPlay(type) {
+
+
         let doing = this.totalTodos.filter(todo => {
           return todo.doing
         })
@@ -458,6 +456,8 @@
       onCompletTodo(item, type) {
 
         this.isbreakTime = false
+        this.isWorking = false
+        this.isbreak = false
 
 
         if (this.todoDoing === undefined) {
@@ -486,7 +486,6 @@
             if (item.id === this.todoDoing.id) {
               todo.doing = false
             }
-
             this.init()
             return !todo.isClicked
           })
@@ -511,13 +510,14 @@
           return
         }
 
+        this.isbreakTime = false
+        this.isWorking = false
+        this.isbreak = false
+
         const len = this.unDoneTodos.length
 
-        if (!len) {
-          this.isbreakTime = false
-        } else {
+        if (len) {
           this.init()
-          this.isbreakTime = false
         }
 
         let s = this.totalTodos.map(todo => {
