@@ -129,15 +129,11 @@
             <div class="clock-upCircle" :class="{'clock-upCircleBreakTime':isbreakTime}">
               <div class="clock-upCircle__content">
                 <template v-if="!isbreakTime">
-                  <i
-                    v-if="!isWorking"
-                    class="material-icons"
-                    @click.once="onPlay('Working')"
-                  >play_arrow</i>
+                  <i v-if="!isWorking" class="material-icons" @click="onPlay('Working')">play_arrow</i>
                   <i v-else class="material-icons" @click="onPause">pause</i>
                 </template>
                 <template v-else>
-                  <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
+                  <i v-if="!isbreak" class="material-icons" @click="onPlay('break')">play_arrow</i>
                   <i v-else class="material-icons" @click="onPause">pause</i>
                 </template>
               </div>
