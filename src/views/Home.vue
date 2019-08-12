@@ -49,13 +49,22 @@
           :class="{'beginTime':isWorking,'breakClock':isbreakTime,'breakBeginTime':isbreak}"
         >
           <div class="clock-btn">
-            <template v-if="!isbreakTime">
-              <i v-if="!isWorking" class="material-icons" @click.once="onPlay('Working')">play_arrow</i>
-              <i v-else class="material-icons" @click="onPause">pause</i>
+            <template v-if="unDoneTodos.length">
+              <template v-if="!isbreakTime">
+                <i
+                  v-if="!isWorking"
+                  class="material-icons"
+                  @click.once="onPlay('Working')"
+                >play_arrow</i>
+                <i v-else class="material-icons" @click="onPause">pause</i>
+              </template>
+              <template v-else>
+                <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
+                <i v-else class="material-icons" @click="onPause">pause</i>
+              </template>
             </template>
             <template v-else>
-              <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
-              <i v-else class="material-icons" @click="onPause">pause</i>
+              <i v-if="!isWorking" class="material-icons" @click="onPlay('Working')">play_arrow</i>
             </template>
           </div>
         </section>
@@ -110,32 +119,25 @@
     <div v-show="openDetail" class="detail">
       <article class="detail-left">
         <section class="detail-left__menu">
-          <div class="menu-list">
+          <div class="menu-list" :class="{'breakTime':isbreakTime}">
             <i class="material-icons">list</i>
             <span class="menu-title">to-do list</span>
           </div>
         </section>
-        <!-- 
-        <div class="clock-btn">
-          <template v-if="!isbreakTime">
-            <i v-if="!isWorking" class="material-icons">play_arrow</i>
-            <i v-else class="material-icons" @click="onPause">pause</i>
-          </template>
-          <template v-else>
-            <i v-if="!isbreak" class="material-icons" @click.once="onPlay('break')">play_arrow</i>
-            <i v-else class="material-icons" @click="onPause">pause</i>
-          </template>
-        </div>-->
         <section v-if="tododoinging !== undefined" class="detail-left__clock">
-          <div class="clock-downCircle">
+          <div class="clock-downCircle" :class="{'clock-breakTime':isbreakTime}">
             <span class="clock-downCircle__time">
               <span>{{isbreakTime ? breakTime : pomodoroTime }}</span>
             </span>
             <span class="clock-downCircle__title">{{todoDoing.title}}</span>
-            <div class="clock-upCircle">
+            <div class="clock-upCircle" :class="{'clock-upCircleBreakTime':isbreakTime}">
               <div class="clock-upCircle__content">
                 <template v-if="!isbreakTime">
-                  <i v-if="!isWorking" class="material-icons">play_arrow</i>
+                  <i
+                    v-if="!isWorking"
+                    class="material-icons"
+                    @click.once="onPlay('Working')"
+                  >play_arrow</i>
                   <i v-else class="material-icons" @click="onPause">pause</i>
                 </template>
                 <template v-else>
@@ -172,12 +174,12 @@
             </div>
           </div>
           <div class="todo">
-            <div class="todo__title" @click="todoOpen = !todoOpen">
+            <div class="todo__title" @click="doneOpen = !doneOpen">
               done
-              <i class="material-icons" v-if="!todoOpen">arrow_drop_up</i>
+              <i class="material-icons" v-if="!doneOpen">arrow_drop_up</i>
               <i class="material-icons" v-else>arrow_drop_down</i>
             </div>
-            <div class="todoAll" v-if="!todoOpen">
+            <div class="todoAll" v-if="doneOpen">
               <div class="todo__listGroup" v-for="item in doneTodos" :key="item.id">
                 <div class="listGroup-list">
                   <span class="listGroup-list__round" @click="onCompletTodo(item)">
@@ -216,8 +218,9 @@
     },
     data() {
       return {
+        doneOpen: true,
         todoOpen: true,
-        openDetail: true,
+        openDetail: false,
         WorkingSecs: 5,      //工作時間
         breakSecs: 3,       //休息時間
         isWorking: false,    //點擊工作開始
@@ -231,7 +234,7 @@
         todoDoing: '',
         totalTodos: [
           {
-            id: '1565457946245',
+            id: '1565357946245',
             title: 'two',
             isCompleted: false,
             isClicked: false,
@@ -239,7 +242,7 @@
             doing: false,
           },
           {
-            id: '1565457946246',
+            id: '1567457946246',
             title: 'one',
             isCompleted: true,
             isClicked: true,
@@ -247,16 +250,24 @@
             doing: false,
           },
           {
-            id: '1565458946246',
-            title: 'ondde',
+            id: '1565457941246',
+            title: 'three',
             isCompleted: false,
             isClicked: false,
-            doTimes: 0,
+            doTimes: 3,
             doing: false,
           },
           {
-            id: '1565457947589',
-            title: 'ofgddfe',
+            id: '1505458946246',
+            title: 'zxcvbnm',
+            isCompleted: false,
+            isClicked: false,
+            doTimes: 5,
+            doing: false,
+          },
+          {
+            id: '1265457947589',
+            title: 'asdfghjkl',
             isCompleted: false,
             isClicked: false,
             doTimes: 2,
@@ -327,7 +338,7 @@
 
         this.isWorking = false
         this.isbreak = false
-        this.WorkingSecs = 15
+        this.WorkingSecs = 5
         this.breakSecs = 3
         this.spacingPart = 0
         this.spacingPart2 = 0
@@ -338,6 +349,19 @@
         clearInterval(this.timeSpacing);
       },
       onPlay(type) {
+        let doing = this.totalTodos.filter(todo => {
+          return todo.doing
+        })
+
+        if (doing.length === 0) {
+          this.$bvToast.toast(`PLEASE ADD TODO TO START!!`, {
+            title: 'Message',
+            toaster: 'b-toaster-top-center',
+            autoHideDelay: 1000,
+          })
+          return
+        }
+
         let secs = [`${type}Secs`]
         let el = document.querySelector('#circle')
         let el2 = document.querySelector('#circle2')
@@ -350,8 +374,6 @@
         this.circlePart2 !== 360 ? circle2 = this.circlePart2 : ''
         this.spacingPart === 0 ? this.spacingPart = spacing : spacing = this.spacingPart
         this.spacingPart2 === 0 ? this.spacingPart2 = spacing2 : spacing2 = this.spacingPart2
-
-
 
         switch (type) {
           case 'Working':
@@ -424,19 +446,27 @@
             }
           )
         }
+        this.$bvToast.toast(`新增成功！`, {
+          title: 'Message',
+          variant: "success",
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 500,
+        })
+
+
       },
       onCompletTodo(item, type) {
-        if (this.todoDoing === undefined) {
 
+        this.isbreakTime = false
+
+
+        if (this.todoDoing === undefined) {
           let num = this.totalTodos.map(todo => {
             return todo.id
           }).indexOf(item.id)
 
           this.totalTodos[num].doing = true
         }
-
-        this.init()
-        this.isbreakTime = false
 
 
         this.totalTodos.map(todo => {
@@ -452,13 +482,12 @@
 
 
         if (item.id === this.todoDoing.id) {
-
-          let filter
-          filter = this.totalTodos.filter((todo, index) => {
+          let filter = this.totalTodos.filter((todo, index) => {
             if (item.id === this.todoDoing.id) {
               todo.doing = false
             }
 
+            this.init()
             return !todo.isClicked
           })
 
@@ -468,14 +497,28 @@
             }).indexOf(filter[0].id)
             this.totalTodos[num].doing = true
             return
-          } else {
-            return
           }
         }
       },
       onChangeTodo(item) {
-        this.init()
-        this.isbreakTime = false
+        if (this.todoDoing.id == item.id) {
+          this.$bvToast.toast(`此項目正在進行中！`, {
+            title: 'Message',
+            variant: "danger",
+            toaster: 'b-toaster-top-center',
+            autoHideDelay: 500,
+          })
+          return
+        }
+
+        const len = this.unDoneTodos.length
+
+        if (!len) {
+          this.isbreakTime = false
+        } else {
+          this.init()
+          this.isbreakTime = false
+        }
 
         let s = this.totalTodos.map(todo => {
           if (this.todoDoing.id == todo.id) {
@@ -620,6 +663,7 @@
             color: #003164;
           }
           &__btn {
+            cursor: pointer;
             i {
               cursor: pointer;
             }
@@ -689,12 +733,6 @@
   // 休息時間
   .homeBreakTime {
     background-color: $darkBg;
-    .home-left__add {
-      color: $darkColor;
-      ::placeholder {
-        color: $darkColor;
-      }
-    }
   }
 
   // 時鐘
@@ -822,6 +860,9 @@
   // 休息的顏色
   .breakTime {
     color: $darkColor !important;
+    &::placeholder {
+      color: $darkColor !important;
+    }
   }
 
   .breakClock {
@@ -870,6 +911,7 @@
         position: absolute;
         bottom: -175px;
         width: 350px;
+
         .clock-downCircle {
           height: 350px;
           background-color: #ffedf7;
@@ -879,6 +921,7 @@
           display: flex;
           flex-direction: column;
           align-items: center;
+
           &__time {
             font-size: 64px;
             line-height: 64px;
@@ -931,6 +974,20 @@
               }
             }
           }
+          .clock-upCircleBreakTime {
+            .clock-upCircle__content {
+              background-color: #00a7ff;
+              &::before {
+                border: 2px solid #00a7ff;
+              }
+            }
+          }
+        }
+        .clock-breakTime {
+          background-color: #e5f3ff;
+          .clock-downCircle__time {
+            color: #00a7ff;
+          }
         }
       }
     }
@@ -953,7 +1010,7 @@
           }
           .todoAll {
             overflow-y: auto;
-            max-height: calc((100vh - 90px) / 2);
+            max-height: calc((100vh - 90px - 104px - 48px - 48px - 20px) / 2);
           }
           .todoAll::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -989,6 +1046,7 @@
                 justify-content: center;
                 align-items: center;
                 margin-right: 6px;
+                cursor: pointer;
                 i {
                   font-size: 18px;
                 }
@@ -1015,6 +1073,9 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                i {
+                  cursor: pointer;
+                }
               }
               .finishSpan {
                 background-color: #ffffff;

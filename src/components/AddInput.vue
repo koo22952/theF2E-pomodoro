@@ -1,11 +1,6 @@
 <template>
-  <section class="home-left__add">
-    <input
-      v-model="inputValue"
-      @keyup.13="onAddList"
-      :class="{'wordColor':isbreakTime}"
-      placeholder="add a new mission…"
-    />
+  <section class="home-left__add" :class="{'wordColor':isbreakTime}">
+    <input v-model="inputValue" @keyup.13="onAddList" placeholder="add a new mission…" />
     <i class="material-icons" @click="onAddList">add</i>
   </section>
 </template>
@@ -46,9 +41,7 @@
     position: relative;
     font-style: italic;
     font-weight: bold;
-    .wordColor {
-      color: $darkColor;
-    }
+
     input {
       height: 100%;
       width: 100%;
@@ -72,6 +65,16 @@
       font-weight: bold;
       font-style: italic;
       color: $lightColor;
+    }
+  }
+
+  .wordColor {
+    color: $darkColor;
+    input {
+      color: $darkColor;
+    }
+    ::placeholder {
+      color: $darkColor;
     }
   }
 </style>
