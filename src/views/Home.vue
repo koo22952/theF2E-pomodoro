@@ -451,10 +451,6 @@
       },
       onCompletTodo(item, type) {
 
-        this.isbreakTime = false
-        this.isWorking = false
-        this.isbreak = false
-
 
         if (this.todoDoing === undefined) {
           let num = this.totalTodos.map(todo => {
@@ -483,6 +479,9 @@
               todo.doing = false
             }
             this.init()
+            this.isbreakTime = false
+            this.isWorking = false
+            this.isbreak = false
             return !todo.isClicked
           })
 
